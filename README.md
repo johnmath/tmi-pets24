@@ -6,7 +6,7 @@
 This repository contains the code for our [PETS'24](https://petsymposium.org/) paper, [TMI! Finetuned Models Leak Private Information from their Pretraining Data](https://arxiv.org/abs/2306.01181). The scripts in this repository will reproduce core results from the paper, but underlying library can be used to run experiments not included in the scripts.
 
 ## Training Shadow Models
-The first script, `train_shadow_models.py` pretrains shadow models on the (CIFAR-100)[https://www.cs.toronto.edu/~kriz/cifar.html] dataset and finetunes them on either (CIFAR-10)[https://www.cs.toronto.edu/~kriz/cifar.html] or a coarse-labeled version of CIFAR-100. This script has the following arguments:
+The first script, `train_shadow_models.py` pretrains shadow models on the [CIFAR-100](https://www.cs.toronto.edu/~kriz/cifar.html) dataset and finetunes them on either [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) or a coarse-labeled version of CIFAR-100. This script has the following arguments:
 
 ```
 options:
