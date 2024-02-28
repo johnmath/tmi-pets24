@@ -1,10 +1,6 @@
 import torch.nn as nn
 import torch
 import torch.optim as optim
-# from opacus import PrivacyEngine
-# from opacus.data_loader import DPDataLoader
-# from opacus.validators import ModuleValidator
-# from opacus.utils.batch_memory_manager import BatchMemoryManager
 import numpy as np
 import os
 import warnings
@@ -260,8 +256,6 @@ class ModelUtility:
             desc_string = "Training..."
         loop = tqdm(range(1, num_epochs + 1), desc=desc_string)
         for epoch in loop:
-            # print(f"Epoch {epoch}")
-            # print("-" * 10)
             
             phases = ["train"]
             if not train_only:
@@ -374,122 +368,3 @@ class ModelUtility:
             dir_to_save_at + "/" + archictecture_name + "_" + str(epoch) + ".pth"
         )
         torch.save(model_to_save, file_to_save_at)
-
-#     def private_fit(
-#         self,
-#         dataloaders,
-#         epsilon=50,
-#         delta=10e-5,
-#         C=1.2,
-#         num_epochs=100,
-#         start_epoch=0,
-#         save=True,
-#         train_only=True,
-#         desc_string=None,
-#         backup_optimizer=optim.SGD,
-        
-#     ):
-
-#         self.model.train()
-
-#         if not desc_string:
-#             desc_string = f"Training privately with target parameters (ε = {epsilon:.2f}, δ = {delta})..."
-        
-#         if not ModuleValidator.is_valid(self.model):
-#             self.model = ModuleValidator.fix(self.model)
-#             self.optimizer = backup_optimizer(self.model.parameters(), lr=self.lr)
-
-#         self.model.to(self.device)
-
-#         privacy_engine = PrivacyEngine()
-         
-#         self.model, self.optimizer, dataloader = privacy_engine.make_private_with_epsilon(
-#             module=self.model,
-#             optimizer=self.optimizer,
-#             epochs=num_epochs,
-#             data_loader=dataloaders["train"],
-#             target_epsilon=epsilon,
-#             target_delta=delta,
-#             max_grad_norm=C
-#         )
-        
-#         with BatchMemoryManager(data_loader=dataloader, 
-#                                 max_physical_batch_size=256, 
-#                                 optimizer=self.optimizer) as memory_safe_dl:
-#             dataloaders["train"] = memory_safe_dl
-        
-#         epoch_loss = []
-#         epoch_acc = []
-        
-#         phases = ["train"]
-#         if not train_only:
-#             phases.append("test")
-
-#         for epoch in tqdm(range(1, num_epochs + 1), desc=desc_string):
-#             for phase in phases:
-
-#                 # Allow gradients when in training phase
-#                 if phase == "train":
-#                     self.model.train()
-#                     running_loss = 0.0
-
-#                 # Freeze gradients when in testing phase
-#                 elif phase == "test":
-#                     self.model.eval()
-#                     running_test_loss = 0.0
-                
-#                 for i, (inputs, labels) in enumerate(dataloaders[phase]):
-#                     inputs = inputs.to(self.device)
-#                     labels = labels.to(self.device)
-                    
-#                     self.optimizer.zero_grad()
-#                     self.model.zero_grad()
-
-#                     if phase == "train":
-#                         outputs = self.model(inputs)
-#                         loss = self.criterion(outputs, labels)
-#                         loss.backward()
-#                         self.optimizer.step()
-#                         running_loss += loss.item() * inputs.size(0)
-
-#                     if phase == "test":
-#                         with torch.no_grad():
-#                             outputs = self.model(inputs)
-#                             test_loss = self.criterion(outputs, labels)
-#                             running_test_loss += test_loss.item() * inputs.size(0)
-
-#             epoch_loss.append(running_loss / len(dataloaders["train"].dataset))
-#             if not train_only:
-#                 epoch_acc.append(running_loss / len(dataloaders["test"].dataset))
-
-#                 # Zero-one Accuracy
-#                 test_acc = self.evaluate_accuracy(dataloaders["test"])
-
-#             if save:
-#                 self.save_model(self.model, epoch + start_epoch, dp=True)
-
-#         # Save stats as np.arrays
-#         archictecture_name = str(type(self.model)).split(".")[-1].split("'")[0]
-#         if save:
-#             np.save(
-#                 self.prefix
-#                 + "DP_"
-#                 + archictecture_name
-#                 + f"_Checkpoints/DP-Train_Loss_{num_epochs}-Epochs",
-#                 epoch_loss,
-#             )
-#             if not train_only:
-#                 np.save(
-#                     self.prefix
-#                     + "DP_"
-#                     + archictecture_name
-#                     + f"_Checkpoints/DP-Test_Loss_{num_epochs}-Epochs",
-#                     epoch_acc,
-#                 )
-
-#         epsilon = privacy_engine.get_epsilon(delta)
-#         print(f"Finished training with privacy parameters (ε = {epsilon:.2f}, δ = {delta})")
-        
-#         if not train_only:
-#             return self.model, epoch_loss, epoch_acc
-#         return self.model, epoch_loss

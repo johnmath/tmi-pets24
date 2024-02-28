@@ -5,10 +5,6 @@ import time
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import confusion_matrix
-# from opacus import PrivacyEngine
-# from opacus.data_loader import DPDataLoader
-# from opacus.validators import ModuleValidator
-# from opacus.utils.batch_memory_manager import BatchMemoryManager
 
 class TorchMLUtils:
     
@@ -109,7 +105,6 @@ class TorchMLUtils:
 
         if (np.sum(y_prob > max_conf)):
             indices = np.argwhere(y_prob > max_conf)
-    #             print(indices)
             for idx in indices:
                 r,c = idx[0],idx[1]
                 y_prob[r][c] = y_prob[r][c] - 1e-16
@@ -142,7 +137,6 @@ class TorchMLUtils:
         logit_arr = logit_arr[logit_arr > middle - variance_adjustment*logit_arr.std()] # Remove observations below the min_range
         logit_arr = logit_arr[logit_arr < middle + variance_adjustment*logit_arr.std()] # Remove observations above max range
         return  logit_arr
-    
     
     @staticmethod
     def fit(dataloaders, 
@@ -288,121 +282,7 @@ class TorchMLUtils:
         else:
             return model, train_error
         
-#     @staticmethod
-#     def private_fit(
-#         dataloaders,
-#         model,
-#         optim_init=optim.Adam,
-#         optim_kwargs={"lr": 0.03},
-#         epsilon=8,
-#         delta=10e-5,
-#         device="cpu",
-#         train_only=True,
-#         C=1.2,
-#         epochs=50,
-#         criterion=nn.CrossEntropyLoss(),
-#         save=False,
-#         save_prefix="",
-#         verbose=False
-#     ):
 
-#         model.train()
-#         optimizer = optim_init(model.parameters(), **optim_kwargs)
-
-#         if not ModuleValidator.is_valid(model):
-#             model = ModuleValidator.fix(model)
-#             optimizer = optim_init(model.parameters(), **optim_kwargs)
-
-#         model.to(device)
-
-#         privacy_engine = PrivacyEngine()
-#         model, optimizer, dataloader = privacy_engine.make_private_with_epsilon(
-#             module=model,
-#             optimizer=optimizer,
-#             epochs=epochs,
-#             data_loader=dataloaders["train"],
-#             target_epsilon=epsilon,
-#             target_delta=delta,
-#             max_grad_norm=C
-#         )
-        
-#         with BatchMemoryManager(data_loader=dataloader, 
-#                                 max_physical_batch_size=512, 
-#                                 optimizer=optimizer) as memory_safe_dl:
-#             dataloaders["train"] = memory_safe_dl
-            
-#         epoch_loss = []
-#         epoch_acc = []
-        
-#         if train_only: phases = ["train"]
-#         else: phases = ["train", "test"]
-        
-#         for epoch in range(1, epochs + 1):
-            
-#             if verbose:
-#                 print(f"Epoch {epoch}")
-#                 print("-" * 10)
-            
-#             for phase in phases:
-
-#                 # Allow gradients when in training phase
-#                 if phase == "train":
-#                     model.train()
-#                     running_loss = 0.0
-
-#                 # Freeze gradients when in testing phase
-#                 elif phase == "test":
-#                     model.eval()
-#                     running_test_loss = 0.0
-                
-#                 for i, (inputs, labels) in enumerate(dataloaders[phase]):
-#                     inputs = inputs.to(device)
-#                     labels = labels.to(device)
-
-#                     optimizer.zero_grad()
-#                     model.zero_grad()
-
-#                     if phase == "train":
-#                         outputs = model(inputs)
-#                         loss = criterion(outputs, labels)
-#                         loss.backward()
-#                         optimizer.step()
-#                         running_loss += loss.item() * inputs.size(0)
-
-#                     if phase == "test":
-#                         with torch.no_grad():
-#                             outputs = model(inputs)
-#                             test_loss = criterion(outputs, labels)
-#                             running_test_loss += test_loss.item() * inputs.size(0)
-
-#             epoch_loss.append(running_loss / len(dataloaders["train"].dataset))
-#             if not train_only:
-#                 epoch_acc.append(running_loss / len(dataloaders["test"].dataset))
-
-#             # Zero-one Accuracy
-#             if not train_only:
-#                 test_acc = TorchMLUtils.get_metrics(dataloaders["test"].dataset, dataset_type="torch")
-            
-
-#             epsilon = privacy_engine.get_epsilon(delta)
-            
-#             if verbose:
-#                 if not train_only:
-#                     print(
-#                         f"Train Loss: {epoch_loss[epoch - 1]:.4}\n"
-#                         f"Test Loss {epoch_acc[epoch-1]:.4}\n"
-#                         f"Test Accuracy {test_acc*100:.4}%\n"
-#                         f"(ε = {epsilon:.2f}, δ = {delta})\n"
-#                     )
-#                 else:
-#                     print(
-#                         f"Train Loss: {epoch_loss[epoch - 1]:.4}\n"
-#                         f"(ε = {epsilon:.2f}, δ = {delta})\n"
-#                 )
-#         if train_only:
-#             return model, epoch_loss
-#         else:
-#              return model, epoch_loss, epoch_acc
             
     @staticmethod
     def get_metrics_from_labels(yhat, y):

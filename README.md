@@ -3,10 +3,10 @@
 **Authors: John Abascal, Stanley Wu, Alina Oprea, Jonathan Ullman**
 
 
-This repository contains the code for our PETS'24 paper, [TMI! Finetuned Models Leak Private Information from their Pretraining Data](https://arxiv.org/abs/2306.01181). The scripts in this repository will reproduce core results from the paper, but underlying library can be used to run experiments not included in the scripts.
+This repository contains the code for our [PETS'24](https://petsymposium.org/) paper, [TMI! Finetuned Models Leak Private Information from their Pretraining Data](https://arxiv.org/abs/2306.01181). The scripts in this repository will reproduce core results from the paper, but underlying library can be used to run experiments not included in the scripts.
 
 ## Training Shadow Models
-The first script, `train_shadow_models.py` pretrains shadow models on the CIFAR-100 dataset and finetunes them on either CIFAR-10 or a coarse-labeled version of CIFAR-100. This script has the following arguments:
+The first script, `train_shadow_models.py` pretrains shadow models on the (CIFAR-100)[https://www.cs.toronto.edu/~kriz/cifar.html] dataset and finetunes them on either (CIFAR-10)[https://www.cs.toronto.edu/~kriz/cifar.html] or a coarse-labeled version of CIFAR-100. This script has the following arguments:
 
 ```
 options:
@@ -69,3 +69,8 @@ python run_attacks.py -v 32 -a 8 -data c10
 ```
 
 In this example, each shadow model is queried on 8 augmentations (random flips and crops) of each image. This produces 64 x 8 prediction vectors for each example. Running this command will create a directory named `Figures/` where the ROC curve plots will be saved. Because the ROC curves are plotted on a log-log scale, setting the number of victim models higher will yield smoother ROC curves as there are more membership-inference samples.
+
+
+-------
+
+This repository was developed in Python 3.11 using the latest versions of [PyTorch](https://pytorch.org/) (with CUDA), (scikit-learn)[https://scikit-learn.org/stable/], [SciPy](https://scipy.org/), [Matplotlib](https://matplotlib.org/), [NumPy](https://numpy.org/), and [tqdm](https://pypi.org/project/tqdm/). The file `requirements.txt` contains the exact [Anaconda](https://anaconda.org/) environment that we used. To create an environment with these packages, run the following command `conda create --name <env> --file requirements.txt`.

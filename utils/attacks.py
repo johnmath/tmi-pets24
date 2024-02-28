@@ -3,7 +3,6 @@ from scipy.stats import norm, multivariate_normal
 import torch
 from .models import NeuralNet, MetaClassifierSet
 
-
 class BaseAttack:
     
     def __init__(self, dataset, target_indices, device):

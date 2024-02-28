@@ -15,7 +15,9 @@ def sweep(score, y, pos_label):
     """
     Compute a ROC curve and then return the FPR, TPR, AUC, and ACC.
     """
-    fpr, tpr, _ = roc_curve(y, score, pos_label=pos_label)
+    # Avoids NaN issues when using few shadow models
+    # A score of 0.5 corresponds to a random guess
+    fpr, tpr, _ = roc_curve(y, torch.nan_to_num(score, nan=0.5), pos_label=pos_label)
     acc = np.max(1 - (fpr + (1 - tpr)) / 2)
 
     return fpr, tpr, auc(fpr, tpr), acc
